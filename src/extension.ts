@@ -1,10 +1,12 @@
 import * as vscode from 'vscode';
-import OpenAI from 'openai-api';
 import path = require('path');
 
-require('dotenv').config();
-// const openaiApiKey = process.env.OPENAI_API_KEY;
-// const openaiApi = new OpenAI(openaiApiKey);
+const { Configuration, OpenAIApi } = require("openai");
+const openaiApiKey = vscode.workspace.getConfiguration().get('openaiApiKey') as string;
+const configuration = new Configuration({
+	apiKey: openaiApiKey,
+});
+const openaiApi = new OpenAIApi(configuration);
 
 async function documentationSelectedBlock() {
 	const editor = vscode.window.activeTextEditor;
@@ -22,29 +24,10 @@ async function documentationSelectedBlock() {
 	const startLine = selection.start.line;
 	const endLine = selection.end.line;
 
-	if (document.lineAt(startLine).text.trim() !== "{" ||
-		document.lineAt(endLine).text.trim() !== "}") {
-		vscode.window.showErrorMessage("Selected block is not a complete block.");
-		return;
-	}
-
-	// const code = document.getText(selection);
-	// const response = await openaiApi.completions.create({
-	// 	engine: 'davinci-codex',
-	// 	prompt: `Document the following code:\n\n${code}\n`,
-	// 	max_tokens: 64,
-	// 	n: 1,
-	// 	stop: ['\n'],
-	// 	temperature: 0.7,
-	// });
-
-	// const documentation = response.data.choices[0].text.trim();
-	// editor.edit(editBuilder => {
-	// 	editBuilder.insert(new vscode.Position(startLine, 0), `/**\n * ${documentation}\n */\n`);
-	// });
+	const documentation = await getDocumentationTextFromOpenAI(document.getText(selection));
 
 	editor.edit(editBuilder => {
-		editBuilder.insert(new vscode.Position(startLine, 0), "/**\n * Your documentation here\n */\n");
+		editBuilder.insert(new vscode.Position(startLine, 0), "/**\n * " + documentation + "\n */\n");
 	});
 }
 
@@ -57,23 +40,29 @@ async function documentationWholeFile() {
 	const document = editor.document;
 	const code = document.getText();
 
-	// const response = await openaiApi.completions.create({
-	// 	engine: 'davinci-codex',
-	// 	prompt: `Document the following code:\n\n${code}\n`,
-	// 	max_tokens: 64,
-	// 	n: 1,
-	// 	stop: ['\n'],
-	// 	temperature: 0.7,
-	// });
-
-	// const documentation = response.data.choices[0].text.trim();
-	// editor.edit(editBuilder => {
-	// 	editBuilder.insert(new vscode.Position(0, 0), `/**\n * ${documentation}\n */\n`);
-	// });
+	const documentation = await getDocumentationTextFromOpenAI(code);
 
 	editor.edit(editBuilder => {
-		editBuilder.insert(new vscode.Position(0, 0), "/**\n * Your documentation here\n */\n");
+		editBuilder.insert(new vscode.Position(0, 0), "/**\n * " + documentation + "\n */\n");
 	});
+}
+
+async function getDocumentationTextFromOpenAI(textToBeDocumented: string) {
+	const aiModel = vscode.workspace.getConfiguration().get('aiModel') as string;
+
+	vscode.window.showInformationMessage("Requesting documentation from OpenAI with using " + aiModel + " model");
+
+	const response = await openaiApi.createCompletion({
+		model: aiModel,
+		prompt: `Document the following code in short words\n\n${textToBeDocumented}\n\n`,
+		max_tokens: 64,
+		n: 1,
+		temperature: 0.3
+	});
+
+	let documentation = response.data.choices[0].text.trim();
+	documentation = documentation.replace(/\.\s/g, ".\n * ");
+	return documentation;
 }
 
 async function openSettings() {
@@ -86,24 +75,15 @@ async function openSettings() {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-	const settingsMenuItem = vscode.commands.registerCommand('extension.openSettings', openSettings);
-	context.subscriptions.push(settingsMenuItem);
-
 	const selectedBlockMenuItem = vscode.commands.registerCommand('extension.documentSelectedBlock', documentationSelectedBlock);
 	context.subscriptions.push(selectedBlockMenuItem);
 
 	const wholeFileMenuItem = vscode.commands.registerCommand('extension.documentWholeFile', documentationWholeFile);
 	context.subscriptions.push(wholeFileMenuItem);
 
-	context.subscriptions.push(vscode.commands.registerCommand('extension.openSettings', openSettings));
 	const openSettingsCommand = vscode.commands.registerCommand('extension.openSettings', () => {
 		openSettings();
 	});
-
-	const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 0);
-	statusBarItem.text = '$(book) OpenAI';
-	statusBarItem.command = 'extension.openSettings';
-
-	context.subscriptions.push(openSettingsCommand, statusBarItem);
+	context.subscriptions.push(openSettingsCommand);
 
 }
