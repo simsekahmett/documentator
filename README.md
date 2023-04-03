@@ -1,71 +1,40 @@
-# documentator README
-
-This is the README for your extension "documentator". After writing up a brief description, we recommend including the following sections.
+# Documentator
+Documentator is a Visual Studio Code extension that allows you to easily create documentation for your code. With Documentator, you can generate documentation for a selected block of code or an entire file with just a few clicks.
 
 ## Features
+* Create code documentation for a selected block of code
+* Create code documentation for an entire file
+* Use OpenAI API to generate documentation automatically
+* Customize the OpenAI API key through the extension settings
+* Display the generated documentation in a popup or as a comment in your code
+* Easy to use and intuitive user interface
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## Getting Started
+To use Documentator, follow these steps:
 
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+1. Install the extension from the Visual Studio Code marketplace
+2. Open a file in Visual Studio Code
+3. Select the block of code you want to document
+4. Right-click on the selection and choose "Document selected block" from the context menu
+5. If you have set your OpenAI API key in the extension settings, you will see a popup with the generated documentation. If not, you will be prompted to set your API key first.
+6. Alternatively, you can also document the entire file by right-clicking on the editor and choosing "Document file" from the context menu.
 
 ## Extension Settings
+The Documentator extension provides the following settings:
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+* `documentator.openaiApiKey`: The API key for the OpenAI API. You can get your API key by creating an account on the OpenAI website.
 
-For example:
+To customize these settings, open the Visual Studio Code settings editor by going to "File" > "Preferences" > "Settings" or by pressing `Ctrl` + `,` (Windows and Linux) or `Cmd` + `,` (macOS). Then, search for "Documentator" and edit the desired setting.
 
-This extension contributes the following settings:
+## Limitations
+* The extension requires an internet connection to use the OpenAI API
+* The OpenAI API has a rate limit and may be subject to usage fees
+* The generated documentation may not always be accurate or complete
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+## Feedback and Contributions
+If you encounter any issues with the extension or have suggestions for new features, please submit an issue on the extension's GitHub repository.
 
-## Known Issues
+If you would like to contribute to the extension, feel free to fork the repository and submit a pull request with your changes.
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+## License
+This extension is licensed under the MIT License.
