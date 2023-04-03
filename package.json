@@ -1,0 +1,80 @@
+{
+  "name": "documentator",
+  "displayName": "Documentator",
+  "description": "Documentator is a Visual Studio Code extension that simplifies the process of creating code documentation. With Documentator, you can easily generate documentation for selected code blocks or for an entire file with just a few clicks. Simply right-click on a code block or file, select the Documentator option from the context menu, and Documentator will automatically generate documentation based on the code structure.",
+  "version": "0.0.1",
+  "publisher": "@simsekahmett",
+  "engines": {
+    "vscode": "^1.77.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "documentation",
+    "code"
+  ],
+  "icon": "icon.png",
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onCommand:extension.documentSelectedBlock",
+    "onCommand:extension.documentWholeFile"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.documentSelectedBlock",
+        "title": "Document Selected Block"
+      },
+      {
+        "command": "extension.documentWholeFile",
+        "title": "Document Whole File"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "extension.documentSelectedBlock",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "extension.documentWholeFile",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "OpenAI",
+      "properties": {
+        "openai.apiKey": {
+          "type": "string",
+          "default": ""
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.77.0",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.56.0",
+    "@typescript-eslint/parser": "^5.56.0",
+    "eslint": "^8.36.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "typescript": "^4.9.5",
+    "@vscode/test-electron": "^2.3.0"
+  },
+  "dependencies": {
+    "openai-api": "^1.3.1"
+  }
+}
