@@ -2,7 +2,7 @@
   "name": "documentator",
   "displayName": "Documentator",
   "description": "Documentator is a Visual Studio Code extension that simplifies the process of creating code documentation. With Documentator, you can easily generate documentation for selected code blocks or for an entire file with just a few clicks. Simply right-click on a code block or file, select the Documentator option from the context menu, and Documentator will automatically generate documentation based on the code structure.",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "publisher": "documentator",
   "engines": {
     "vscode": "^1.75.0"
