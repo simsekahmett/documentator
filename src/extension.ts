@@ -2,11 +2,6 @@ import * as vscode from 'vscode';
 import path = require('path');
 
 const { Configuration, OpenAIApi } = require("openai");
-const openaiApiKey = vscode.workspace.getConfiguration().get('openaiApiKey') as string;
-const configuration = new Configuration({
-	apiKey: openaiApiKey,
-});
-const openaiApi = new OpenAIApi(configuration);
 
 async function documentationSelectedBlock() {
 	const editor = vscode.window.activeTextEditor;
@@ -26,9 +21,11 @@ async function documentationSelectedBlock() {
 
 	const documentation = await getDocumentationTextFromOpenAI(document.getText(selection));
 
-	editor.edit(editBuilder => {
-		editBuilder.insert(new vscode.Position(startLine, 0), "/**\n * " + documentation + "\n */\n");
-	});
+	if (documentation !== undefined) {
+		editor.edit(editBuilder => {
+			editBuilder.insert(new vscode.Position(startLine, 0), "/**\n * " + documentation + "\n */\n");
+		});
+	}
 }
 
 async function documentationWholeFile() {
@@ -42,27 +39,39 @@ async function documentationWholeFile() {
 
 	const documentation = await getDocumentationTextFromOpenAI(code);
 
-	editor.edit(editBuilder => {
-		editBuilder.insert(new vscode.Position(0, 0), "/**\n * " + documentation + "\n */\n");
-	});
+	if (documentation !== undefined) {
+		editor.edit(editBuilder => {
+			editBuilder.insert(new vscode.Position(0, 0), "/**\n * " + documentation + "\n */\n");
+		});
+	}
 }
 
 async function getDocumentationTextFromOpenAI(textToBeDocumented: string) {
+	let openaiApiKey = vscode.workspace.getConfiguration().get('openaiApiKey') as string;
+	const configuration = new Configuration({
+		apiKey: openaiApiKey,
+	});
+	const openaiApi = new OpenAIApi(configuration);
 	const aiModel = vscode.workspace.getConfiguration().get('aiModel') as string;
 
-	vscode.window.showInformationMessage("Requesting documentation from OpenAI with using " + aiModel + " model");
+	if (openaiApiKey !== '') {
+		vscode.window.showInformationMessage("Requesting documentation from OpenAI with using " + aiModel + " model");
 
-	const response = await openaiApi.createCompletion({
-		model: aiModel,
-		prompt: `Document the following code in short words\n\n${textToBeDocumented}\n\n`,
-		max_tokens: 64,
-		n: 1,
-		temperature: 0.3
-	});
+		const response = await openaiApi.createCompletion({
+			model: aiModel,
+			prompt: `Document the following code in short words\n\n${textToBeDocumented}\n\n`,
+			max_tokens: 64,
+			n: 1,
+			temperature: 0.3
+		});
 
-	let documentation = response.data.choices[0].text.trim();
-	documentation = documentation.replace(/\.\s/g, ".\n * ");
-	return documentation;
+		let documentation = response.data.choices[0].text.trim();
+		documentation = documentation.replace(/\.\s/g, ".\n * ");
+		return documentation;
+	}
+	else {
+		vscode.window.showInformationMessage("OpenAI key not found, please set it through settings");
+	}
 }
 
 async function openSettings() {
@@ -86,4 +95,18 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(openSettingsCommand);
 
+	let openaiApiKey = vscode.workspace.getConfiguration().get('openaiApiKey') as string;
+
+	if (openaiApiKey === '') {
+		vscode.window.showInputBox({
+			prompt: "Enter OpenAI API Key",
+			value: ""
+		}).then((inputValue) => {
+			if (inputValue !== undefined) {
+				const config = vscode.workspace.getConfiguration();
+				config.update('openaiApiKey', inputValue, vscode.ConfigurationTarget.Global);
+				vscode.window.showInformationMessage('OpenAI API key saved successfully!');
+			}
+		});
+	}
 }
